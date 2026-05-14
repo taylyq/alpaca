@@ -4,7 +4,8 @@ Static assets and PHP pages for the website currently deployed from Hostinger `p
 
 ## Local setup
 
-This site expects MySQL database credentials from environment variables:
+This site expects MySQL database credentials from either a private `db.local.php`
+file on the server or environment variables:
 
 - `DB_HOST`
 - `DB_NAME`
@@ -12,7 +13,9 @@ This site expects MySQL database credentials from environment variables:
 - `DB_PASS`
 - `DB_CHARSET` optional, defaults to `utf8mb4`
 
-Do not commit live credentials. Use `db.example.php` as a reminder of the required values when configuring hosting.
+Do not commit live credentials. Copy `db.local.example.php` to `db.local.php`
+on Hostinger and fill in the real database values there, or configure the
+environment variables above.
 
 ## Deploying updates
 

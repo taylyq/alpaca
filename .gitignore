@@ -3,5 +3,6 @@
 .env
 .env.*
 !.env.example
+db.local.php
 vendor/
 node_modules/

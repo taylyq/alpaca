@@ -1,9 +1,23 @@
 <?php
-$host = getenv('DB_HOST') ?: 'localhost';
-$db = getenv('DB_NAME') ?: '';
-$user = getenv('DB_USER') ?: '';
-$pass = getenv('DB_PASS') ?: '';
-$charset = getenv('DB_CHARSET') ?: 'utf8mb4';
+$localConfig = __DIR__ . '/db.local.php';
+
+if (is_readable($localConfig)) {
+    $config = require $localConfig;
+} else {
+    $config = [
+        'host' => getenv('DB_HOST') ?: 'localhost',
+        'name' => getenv('DB_NAME') ?: '',
+        'user' => getenv('DB_USER') ?: '',
+        'pass' => getenv('DB_PASS') ?: '',
+        'charset' => getenv('DB_CHARSET') ?: 'utf8mb4',
+    ];
+}
+
+$host = $config['host'] ?? 'localhost';
+$db = $config['name'] ?? '';
+$user = $config['user'] ?? '';
+$pass = $config['pass'] ?? '';
+$charset = $config['charset'] ?? 'utf8mb4';
 
 if ($db === '' || $user === '') {
     http_response_code(500);
