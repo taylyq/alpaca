@@ -1,4 +1,6 @@
 <?php
+// Keep the real db.local.php outside public_html on Hostinger so Git deploys
+// cannot overwrite it.
 return [
     'host' => 'localhost',
     'name' => 'your_database_name',

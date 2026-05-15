@@ -1,9 +1,19 @@
 <?php
-$localConfig = __DIR__ . '/db.local.php';
+$localConfigPaths = [
+    dirname(__DIR__) . '/db.local.php',
+    __DIR__ . '/db.local.php',
+];
 
-if (is_readable($localConfig)) {
-    $config = require $localConfig;
-} else {
+$config = null;
+
+foreach ($localConfigPaths as $localConfig) {
+    if (is_readable($localConfig)) {
+        $config = require $localConfig;
+        break;
+    }
+}
+
+if (!is_array($config)) {
     $config = [
         'host' => getenv('DB_HOST') ?: 'localhost',
         'name' => getenv('DB_NAME') ?: '',

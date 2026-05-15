@@ -60,5 +60,17 @@ function getJournals($pdo) {
     );
     $stmt->execute([$cityId]);
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (!$rows) {
+        $stmt = $pdo->prepare(
+            "SELECT id, title, content, photo_url, video_url, created_at
+             FROM journals
+             WHERE city_id = ?
+             ORDER BY created_at DESC"
+        );
+        $stmt->execute([$cityId]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     echo json_encode($rows);
 }
