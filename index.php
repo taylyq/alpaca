@@ -9,7 +9,7 @@
   <meta name="google-site-verification" content="kAwlgTHAoaQm5AUjc8bPJLnXnsc5tR7zNfob1M1i-As" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" href="images/favicon.ico" />
-  <link rel="stylesheet" href="styles.css?v51" />
+  <link rel="stylesheet" href="styles.css?v52" />
 </head>
 <body>
   <header class="top-header">
@@ -59,6 +59,24 @@
       Choose a country and city to see journals.
     </div>
   </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="images/logo.png" alt="" class="footer-logo" aria-hidden="true" />
+        <div>
+          <div class="footer-name">Alpaca Travels</div>
+          <p class="footer-slogan">I&apos;ll pack the courage to travel</p>
+        </div>
+      </div>
+
+      <nav class="footer-links" aria-label="Footer links">
+        <a href="#country-select">Explore cities</a>
+        <a href="login.php">Submit a journal</a>
+        <a href="mailto:info@alpacatravels.com">info@alpacatravels.com</a>
+      </nav>
+    </div>
+  </footer>
 
   <script src="script.js?v17"></script>
 </body>
