@@ -72,7 +72,7 @@
 
       <nav class="footer-links" aria-label="Footer links">
         <a href="#country-select">Explore cities</a>
-        <a href="login.php">Submit a journal</a>
+        <a href="login.php">Log in</a>
         <a href="mailto:info@alpacatravels.com">info@alpacatravels.com</a>
       </nav>
     </div>
