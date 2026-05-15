@@ -2,13 +2,18 @@
 // user_journal.php
 declare(strict_types=1);
 error_reporting(E_ALL);
-ini_set('display_errors', '1');
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
 
 require __DIR__ . '/config.php';
 require_login();
 
 $message = '';
 $error = '';
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(16));
+}
 
 // Load countries
 $countries = $pdo->query('SELECT id, name FROM countries ORDER BY name')->fetchAll();
@@ -30,7 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_journal'])) {
     $photoUrl = trim($_POST['photo_url'] ?? '');
     $videoUrl = trim($_POST['video_url'] ?? '');
 
-    if ($countryId <= 0 || $cityId <= 0 || $title === '' || $content === '') {
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+        $error = 'Invalid CSRF token.';
+    } elseif ($countryId <= 0 || $cityId <= 0 || $title === '' || $content === '') {
         $error = 'Country, city, title, and content are required.';
     } else {
         $stmt = $pdo->prepare('SELECT COUNT(*) FROM cities WHERE id = ? AND country_id = ?');
@@ -76,6 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_journal'])) {
     <?php endif; ?>
 
     <form method="post" action="user_journal.php">
+      <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
+
       <div>
         <label>Country</label><br>
         <select name="country_id" required onchange="this.form.submit()">

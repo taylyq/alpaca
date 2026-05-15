@@ -7,10 +7,9 @@
   <meta name="description" content="Search through the top cities of the world to see new cultures." />
   <meta name="robots" content="index, follow" />
   <meta name="google-site-verification" content="kAwlgTHAoaQm5AUjc8bPJLnXnsc5tR7zNfob1M1i-As" />
-  <meta name="robots" content="index, follow" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" href="images/favicon.ico" />
-  <link rel="stylesheet" href="styles.css?v50" />
+  <link rel="stylesheet" href="styles.css?v51" />
 </head>
 <body>
   <header class="top-header">
@@ -18,9 +17,12 @@
       <img src="images/logo.png" alt="Alpaca Travels logo" class="brand-logo" />
       <div class="logo-text">Alpaca Travels</div>
     </div>
-    <nav id="country-nav" class="country-nav">
-      <!-- Country buttons injected by script.js -->
-    </nav>
+    <div class="country-picker" id="country-nav">
+      <label for="country-select">Country</label>
+      <select id="country-select" aria-label="Choose a country">
+        <option value="">Loading countries...</option>
+      </select>
+    </div>
   </header>
 
   <section class="sub-header">
@@ -58,6 +60,6 @@
     </div>
   </main>
 
-  <script src="script.js?v16"></script>
+  <script src="script.js?v17"></script>
 </body>
 </html>

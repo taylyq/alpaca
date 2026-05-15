@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+header('X-Content-Type-Options: nosniff');
 require_once 'db.php';
 
 $action = $_GET['action'] ?? '';
@@ -54,6 +55,7 @@ function getJournals($pdo) {
         "SELECT id, title, content, photo_url, video_url, created_at
          FROM journals
          WHERE city_id = ?
+           AND is_approved = 1
          ORDER BY created_at DESC"
     );
     $stmt->execute([$cityId]);

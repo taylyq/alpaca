@@ -1,4 +1,5 @@
 const countryNav = document.getElementById('country-nav');
+const countrySelect = document.getElementById('country-select');
 const cityNav = document.getElementById('city-nav');
 const journalGrid = document.getElementById('journal-grid');
 const emptyState = document.getElementById('empty-state');
@@ -11,6 +12,47 @@ let currentCountryName = null;
 let currentCityId = null;
 let currentCities = [];
 let firstLoadDone = false;
+
+const COUNTRY_CONTINENTS = {
+  Austria: 'Europe',
+  China: 'Asia',
+  Colombia: 'South America',
+  'Costa Rica': 'North America',
+  Croatia: 'Europe',
+  Egypt: 'Africa',
+  'El Salvador': 'North America',
+  France: 'Europe',
+  Germany: 'Europe',
+  Greece: 'Europe',
+  'Hong Kong': 'Asia',
+  India: 'Asia',
+  Ireland: 'Europe',
+  Italy: 'Europe',
+  Japan: 'Asia',
+  Mexico: 'North America',
+  Morocco: 'Africa',
+  Netherlands: 'Europe',
+  Poland: 'Europe',
+  Portugal: 'Europe',
+  Russia: 'Europe',
+  'South Korea': 'Asia',
+  Spain: 'Europe',
+  Thailand: 'Asia',
+  Turkey: 'Asia',
+  Ukraine: 'Europe',
+  USA: 'North America',
+  Vietnam: 'Asia',
+};
+
+const CONTINENT_ORDER = [
+  'Africa',
+  'Asia',
+  'Europe',
+  'North America',
+  'South America',
+  'Oceania',
+  'Other',
+];
 
 async function fetchJSON(url) {
   try {
@@ -52,40 +94,78 @@ async function loadCountries() {
   const countries = await fetchJSON('api.php?action=countries');
   if (!countries || !Array.isArray(countries) || countries.length === 0) {
     console.error('No countries returned');
+    if (countrySelect) {
+      countrySelect.innerHTML = '<option value="">Countries unavailable</option>';
+      countrySelect.disabled = true;
+    }
     return;
   }
 
-  countryNav.innerHTML = '';
-
-  countries.forEach(country => {
-    const btn = document.createElement('button');
-    btn.textContent = country.name;
-    btn.dataset.id = country.id;
-    btn.addEventListener('click', () => {
-      currentCountryId = country.id;
-      currentCountryName = country.name;
-      currentCityId = null;
-      setActiveButton(countryNav, btn);
-      loadCities(country.id, false, country.name);
-      clearJournals();
-    });
-    countryNav.appendChild(btn);
-  });
+  renderCountrySelect(countries);
 
   if (!firstLoadDone) {
     const randomCountry = countries[Math.floor(Math.random() * countries.length)];
-    currentCountryId = randomCountry.id;
-    currentCountryName = randomCountry.name;
-
-    const randomCountryBtn = Array.from(countryNav.querySelectorAll('button'))
-      .find(b => Number(b.dataset.id) === Number(randomCountry.id));
-    if (randomCountryBtn) {
-      setActiveButton(countryNav, randomCountryBtn);
-    }
-
-    await loadCities(randomCountry.id, true, randomCountry.name);
+    await selectCountry(randomCountry, true);
     firstLoadDone = true;
   }
+}
+
+function renderCountrySelect(countries) {
+  if (!countrySelect) return;
+
+  const countriesByContinent = countries.reduce((groups, country) => {
+    const continent = COUNTRY_CONTINENTS[country.name] || 'Other';
+    if (!groups.has(continent)) {
+      groups.set(continent, []);
+    }
+    groups.get(continent).push(country);
+    return groups;
+  }, new Map());
+
+  countrySelect.innerHTML = '';
+  countrySelect.disabled = false;
+
+  CONTINENT_ORDER
+    .filter(continent => countriesByContinent.has(continent))
+    .forEach(continent => {
+      const group = document.createElement('optgroup');
+      group.label = continent;
+
+      countriesByContinent.get(continent)
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .forEach(country => {
+          const option = document.createElement('option');
+          option.value = country.id;
+          option.textContent = country.name;
+          option.dataset.name = country.name;
+          group.appendChild(option);
+        });
+
+      countrySelect.appendChild(group);
+    });
+
+  countrySelect.addEventListener('change', () => {
+    const selectedOption = countrySelect.selectedOptions[0];
+    if (!selectedOption) return;
+
+    selectCountry({
+      id: selectedOption.value,
+      name: selectedOption.dataset.name || selectedOption.textContent,
+    }, false);
+  });
+}
+
+async function selectCountry(country, autoPickRandomCity) {
+  currentCountryId = country.id;
+  currentCountryName = country.name;
+  currentCityId = null;
+
+  if (countrySelect && String(countrySelect.value) !== String(country.id)) {
+    countrySelect.value = country.id;
+  }
+
+  clearJournals();
+  await loadCities(country.id, autoPickRandomCity, country.name);
 }
 
 /* CITIES */
@@ -182,9 +262,13 @@ async function loadJournals(cityId) {
     textP.textContent = j.content || '';
     content.appendChild(textP);
 
-    if (j.video_url && j.video_url.trim() !== '') {
+    const safeVideoUrl = j.video_url && j.video_url.trim() !== ''
+      ? getSafeEmbedUrl(j.video_url)
+      : null;
+
+    if (safeVideoUrl) {
       const iframe = document.createElement('iframe');
-      iframe.src = j.video_url;
+      iframe.src = safeVideoUrl;
       iframe.title = 'YouTube video player';
       iframe.frameBorder = '0';
       iframe.allow =
@@ -241,6 +325,34 @@ function setActiveButton(container, activeBtn) {
     btn.classList.remove('active');
   });
   activeBtn.classList.add('active');
+}
+
+function getSafeEmbedUrl(url) {
+  try {
+    const parsedUrl = new URL(url);
+    const host = parsedUrl.hostname.replace(/^www\./, '');
+
+    if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
+      if (parsedUrl.pathname.startsWith('/embed/')) {
+        return parsedUrl.href;
+      }
+
+      if (parsedUrl.pathname === '/watch' && parsedUrl.searchParams.has('v')) {
+        return `https://www.youtube-nocookie.com/embed/${encodeURIComponent(parsedUrl.searchParams.get('v'))}`;
+      }
+    }
+
+    if (host === 'youtu.be') {
+      const videoId = parsedUrl.pathname.replace('/', '');
+      if (videoId) {
+        return `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}`;
+      }
+    }
+  } catch (err) {
+    console.error('Invalid video URL', err);
+  }
+
+  return null;
 }
 
 function clearJournals() {

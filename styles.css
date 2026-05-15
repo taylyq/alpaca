@@ -56,8 +56,51 @@ body {
   text-transform: uppercase;
 }
 
-/* Country and city navs (pill buttons) */
-.country-nav,
+/* Country and city navigation */
+.country-picker {
+  display: grid;
+  grid-template-columns: auto minmax(220px, 320px);
+  align-items: center;
+  gap: 10px;
+  max-width: 520px;
+  width: 100%;
+}
+
+.country-picker label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7f6951;
+}
+
+.country-picker select {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(110, 85, 60, 0.5);
+  background-color: #fbf4e6;
+  color: #3b2718;
+  padding: 8px 42px 8px 16px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(60, 40, 25, 0.08);
+}
+
+.country-picker select:focus {
+  outline: 2px solid rgba(74, 53, 37, 0.35);
+  outline-offset: 3px;
+}
+
+.country-picker select:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
 .city-nav {
   display: flex;
   flex-wrap: wrap;
@@ -83,7 +126,6 @@ body {
 }
 
 /* Shared pill button base */
-.country-nav button,
 .city-nav button,
 .next-city-button {
   border-radius: 999px;
@@ -105,7 +147,6 @@ body {
     transform 0.16s ease;
 }
 
-.country-nav button:hover,
 .city-nav button:hover,
 .next-city-button:hover:not(:disabled) {
   background-color: #f0e0c7;
@@ -116,7 +157,6 @@ body {
 }
 
 /* Active nav button */
-.country-nav button.active,
 .city-nav button.active {
   background: #4a3525;
   color: #fdf5ea;
@@ -295,10 +335,22 @@ body {
 }
 
 @media (max-width: 768px) {
+  .top-header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 16px;
+  }
+
   .top-header,
   .sub-header,
   .main-content {
     padding-inline: 12px;
+  }
+
+  .country-picker {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    max-width: none;
   }
 
   .hero {
@@ -311,12 +363,10 @@ body {
 }
 
 @media (max-width: 480px) {
-  .country-nav,
   .city-nav {
     gap: 6px;
   }
 
-  .country-nav button,
   .city-nav button {
     padding: 6px 12px;
     font-size: 0.78rem;
